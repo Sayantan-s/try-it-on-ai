@@ -45,7 +45,7 @@ const Root: FC<Props> = ({ show, onCloseModal, onSubmit, children }) => {
         show ? (
           <dialog
             ref={ref}
-            className="relative z-40 backdrop:blur-sm p-6 rounded-xl shadow-slate-950/20 backdrop:bg-slate-950/50 backdrop:backdrop-blur-xl w-full max-w-md aspect-video flex justify-center items-center flex-col"
+            className="relative z-40 backdrop:blur-sm p-6 rounded-xl shadow-slate-950/20 backdrop:bg-slate-950/50 backdrop:backdrop-blur-xl w-full max-w-sm sm:max-w-md aspect-video flex justify-center items-center flex-col"
           >
             <button
               className="w-6 h-6 absolute top-2 right-2 bg-rose-50 hover:bg-rose-100 flex items-center justify-center rounded-full"
