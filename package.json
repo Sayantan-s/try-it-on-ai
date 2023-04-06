@@ -14,8 +14,7 @@
     "lint": "next lint",
     "format": "prettier --write .",
     "prepare": "is-ci || husky install",
-    "install:prod": "yarn install --ignore-scripts",
-    "precommit": "lint-staged"
+    "install:prod": "yarn install --ignore-scripts"
   },
   "dependencies": {
     "@tanstack/react-query": "^4.28.0",
@@ -32,7 +31,6 @@
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-is": "^18.2.0",
-    "react-virtualized": "^9.22.3",
     "superjson": "^1.12.2",
     "typescript": "5.0.2",
     "zod": "^3.21.4"
