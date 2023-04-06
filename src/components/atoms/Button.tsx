@@ -6,6 +6,8 @@ const styles = cva('font-medium rounded-full', {
     variant: {
       'primary-indigo':
         'bg-indigo-500 text-white shadow-md shadow-indigo-600/30  border-transparent border',
+      'primary-success':
+        'bg-emerald-500 text-white shadow-md shadow-emerald-600/30  border-transparent border',
       'secondary-indigo':
         'bg-indigo-50 text-indigo-500  border-transparent border',
       'ghost-indigo': 'text-indigo-500 border border-indigo-200',

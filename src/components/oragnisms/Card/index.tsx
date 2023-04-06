@@ -1,120 +1,53 @@
 import { Button } from '@/components/atoms';
+import { useHandleInput } from '@/hooks';
 import { TPhoto } from '@/types';
 import { trpc } from '@/utils/trpc';
 import NextImage from 'next/image';
-import { FC, MouseEventHandler, useEffect, useRef, useState } from 'react';
+import { FC, Fragment, useState } from 'react';
 import { Modal } from '../Modal';
+import { useCanvas } from './useCanvas';
 
-{
-  /* I kept the whole buisness logic in the card component for state colocation */
-}
+// I kept the whole buisness logic in the card component for state colocation
 
 type Props = TPhoto;
 
 export const Card: FC<Props> = ({ url: img, photo_id }) => {
   const { mutateAsync, isLoading } = trpc.photos.update.useMutation();
+  const [
+    edit,
+    url,
+    canvasRef,
+    containerRef,
+    onEdit,
+    onCanvasClick,
+    isEdited,
+    setIsEdited,
+  ] = useCanvas({ img });
 
-  const [imageLoaded, setImageLoaded] = useState(false);
-  const [url, setUrl] = useState(img);
-  const [edit, setEdit] = useState(false);
-  const [isEdited, setIsEdited] = useState(false);
   const [showCardModal, setShowCardModal] = useState(false);
-  const [input, setInput] = useState('');
-
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const canvasImageRef = useRef<HTMLImageElement>(
-    typeof window !== 'undefined' ? new Image() : null
-  ); // No need to create the Image Object on every useEffect call.
-  const containerRef = useRef<HTMLDivElement>(null);
+  const [input, handleInput] = useHandleInput('');
 
   const buttonEditText = edit ? 'Save' : 'Edit';
   const buttonRequestText = isLoading ? 'Saving...' : 'Save';
-
-  const onCanvasClick: MouseEventHandler<HTMLCanvasElement> = (event) => {
-    if (!imageLoaded) return;
-    setIsEdited(true);
-    const x = event.nativeEvent.offsetX; // click coords X axis
-    const y = event.nativeEvent.offsetY; // click coords Y axis
-    const canvas = canvasRef.current!;
-    const ctx = canvas.getContext('2d');
-    ctx?.clearRect(x, y, 5, 5); // Erase a 10x10 square around the clicked point
-  };
-
-  const onEdit = () => {
-    setEdit((prevState) => !prevState);
-    if (edit && imageLoaded) {
-      setImageLoaded(false);
-      setUrl(canvasRef.current!.toDataURL('image/webp'));
-      document.body.style.overflow = 'scroll';
-    } else {
-      containerRef.current?.scrollIntoView({
-        behavior: 'smooth',
-        block: 'center',
-        inline: 'center',
-      });
-      document.body.style.overflow = 'hidden';
-    }
-  };
 
   const onRequestEdit = () => setShowCardModal(true);
 
   const onRequestSubmit = async () => {
     await mutateAsync({ url, photo_id, requestedEdit: input });
     setIsEdited(false);
-    setTimeout(() => {
-      setShowCardModal(false);
-    }, 3000);
+    setShowCardModal(false);
   };
 
-  useEffect(() => {
-    const image = canvasImageRef.current!;
-    image.src = url;
-    const canvas = canvasRef.current!;
-    function paintImageOnCanvas() {
-      if (canvas) {
-        const { clientWidth, clientHeight } =
-          canvas?.parentNode as HTMLDivElement;
-        canvas.width = clientWidth; // width of the container
-        canvas.height = clientHeight; // height of the container
-        const canvasRatio = canvas.width / canvas.height;
-        const imageRatio = image.width / image.height;
-        let drawWidth = canvas.width;
-        let drawHeight = canvas.height;
-        if (canvasRatio > imageRatio) {
-          drawWidth = canvas.height * imageRatio;
-        } else {
-          drawHeight = canvas.width / imageRatio;
-        }
-        const x = (drawWidth - canvas.width) / 2;
-        const y = (drawHeight - canvas.height) / 2;
-        const ctx = canvas.getContext('2d');
-        if (ctx) {
-          ctx.imageSmoothingEnabled = false;
-          ctx.imageSmoothingQuality = 'high';
-          ctx.drawImage(image, -x, -y, drawWidth, drawHeight);
-          setImageLoaded(true);
-        }
-      }
-    }
-    if (edit) {
-      image.crossOrigin = 'anonymous';
-      image.addEventListener('load', paintImageOnCanvas);
-    }
-    return () => {
-      image.removeEventListener('load', paintImageOnCanvas);
-    };
-  }, [edit]);
-
   return (
-    <>
+    <Fragment>
       <div
         ref={containerRef}
-        className={`p-4 shadow-md shadow-slate-500/10 rounded-xl bg-white will-change-transform ${
-          edit ? 'z-30 shadow-xl' : ''
+        className={`p-4 shadow-slate-500/10 rounded-xl bg-white will-change-transform ${
+          edit ? 'z-30 shadow-xl' : 'shadow-md'
         }`}
       >
         <div
-          className={`relative w-full aspect-video overflow-hidden ${
+          className={`relative w-full aspect-[16/10] overflow-hidden ${
             edit ? 'border border-indigo-300/30 rounded-xl' : ''
           }`}
         >
@@ -129,13 +62,15 @@ export const Card: FC<Props> = ({ url: img, photo_id }) => {
               src={url}
               alt={`img_${photo_id}`}
               fill
-              sizes="100vw"
+              sizes="(max-width: 768px) 100vw,
+              (max-width: 1200px) 50vw,
+              33vw"
               crossOrigin="anonymous"
               className="object-center w-full h-full object-contain" // setting this to object-fit:contain so that the original aspect ratio of the image is maintained
             />
           )}
         </div>
-        <div className="space-x-4 flex mt-6 w-[55%] mx-auto">
+        <div className="space-x-4 flex mt-6 md:w-[80%] lg:w-[60%] w-full mx-auto">
           <Button
             className="flex-1"
             size={'full'}
@@ -169,7 +104,7 @@ export const Card: FC<Props> = ({ url: img, photo_id }) => {
             className="w-full focus:outline-none p-3 rounded-xl text-sm placeholder:text-slate-300 bg-slate-100"
             placeholder="Deleted pixels by the top edg..."
             value={input}
-            onChange={(eve) => setInput(eve.target.value)}
+            onChange={handleInput}
           />
         </Modal.Body>
         <Modal.Footer>
@@ -182,8 +117,6 @@ export const Card: FC<Props> = ({ url: img, photo_id }) => {
           </Button>
         </Modal.Footer>
       </Modal>
-    </>
+    </Fragment>
   );
 };
-
-Card.displayName = 'Card';
