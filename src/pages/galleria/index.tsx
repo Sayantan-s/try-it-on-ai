@@ -1,8 +1,9 @@
 import { Page } from '@/components/atoms';
 import { Card } from '@/components/oragnisms/Card';
-import { prodApi } from '@/utils/router';
+import { dbDirectory, prodApi } from '@/utils/router';
 import { trpc } from '@/utils/trpc';
 import { GetServerSideProps } from 'next';
+import fs from 'node:fs/promises';
 
 // The experience can be furthur improved using List virtualisation, paginated queries(infinite scrolling).
 
@@ -26,8 +27,8 @@ export default Galleria;
 
 export const getServerSideProps: GetServerSideProps = async () => {
   try {
-    // await fs.access(dbDirectory('db.json'));
-    await prodApi('GET');
+    if (process.env.NODE_ENV === 'production') await prodApi('GET');
+    else await fs.access(dbDirectory('db.json'));
     return {
       props: {},
     };

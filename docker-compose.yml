@@ -8,3 +8,6 @@ services:
     environment:
       UNSPLASH_API_KEY: G1jsrl5j4SjbgyPd4M-ZmfasNfTUF_KttBMguP3qcuc
       UNSPLASH_SECRET_KEY: zPhanTqlY2rqRF7jEwVF8PN5ecsuQNI4_sfHdQy8EMU
+      MASTER_KEY: '$2b$10$0yLCbylmLsYAdOefSO5iA./psg8HbVFnJSCoLRffSnBcrKd6f/gwi'
+      ACCESS_KEY: '$2b$10$2tEiGm/EFZcGjGhgmUYzYOsZoUlx5U6xDxbS6oDHwoXR4NDW55uNK'
+      BIN_ID: 642fb904ebd26539d0a61a4d
