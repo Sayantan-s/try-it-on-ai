@@ -40,8 +40,8 @@ export const appRouter = t.router({
   photos: t.router({
     get: t.procedure.query(async () => {
       try {
-        const photos: PhotoData = JSON.parse(await fs.readFile(dir, 'utf-8'));
-        return { photos: photos.data };
+        // const photos: PhotoData = JSON.parse(await fs.readFile(dir, 'utf-8'));
+        return { photos: dir };
       } catch (error) {
         throw new TRPCError({
           code: 'CONFLICT',
