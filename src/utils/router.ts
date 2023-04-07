@@ -1,4 +1,4 @@
-import { initTRPC } from '@trpc/server';
+import { TRPCError, initTRPC } from '@trpc/server';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { z } from 'zod';
@@ -56,14 +56,30 @@ export const appRouter = t.router({
       await fs.access(dir);
       return { message: 'db is already generated!' } as const;
     } catch (error) {
-      await fs.mkdir(dbDirectory()); // Create the db folder
-      const data = await getPhotos<ApiResponse>(50, 25);
-      const payload = data.map((picture) => ({
-        photo_id: picture.id,
-        url: picture.urls.regular,
-      }));
-      await fs.appendFile(dir, JSON.stringify({ data: payload })); // creates the db.json
-      return { message: 'db generated!' } as const;
+      try {
+        await fs.mkdir(dbDirectory()); // Create the db folder
+      } catch (error) {
+        throw new TRPCError({
+          code: 'PARSE_ERROR',
+          message: (error as Error).message,
+          cause: error,
+        });
+      }
+      try {
+        const data = await getPhotos<ApiResponse>(50, 25);
+        const payload = data.map((picture) => ({
+          photo_id: picture.id,
+          url: picture.urls.regular,
+        }));
+        await fs.appendFile(dir, JSON.stringify({ data: payload })); // creates the db.json
+        return { message: 'db generated!' } as const;
+      } catch (error) {
+        throw new TRPCError({
+          code: 'CONFLICT',
+          message: (error as Error).message,
+          cause: error,
+        });
+      }
     }
   }),
 });
