@@ -19,7 +19,9 @@ interface ApiResponse {
 const t = initTRPC.create();
 
 export const dbDirectory = (...args: string[]) =>
-  path.resolve(process.cwd(), 'db', ...args);
+  process.env.NODE_ENV === 'development'
+    ? path.resolve(process.cwd(), 'db', ...args)
+    : path.join('/tmp', 'db', ...args);
 
 const dir = dbDirectory('db.json');
 
