@@ -1,4 +1,5 @@
 import { TRPCError, initTRPC } from '@trpc/server';
+import fileSystem from 'fs';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { z } from 'zod';
@@ -18,10 +19,14 @@ interface ApiResponse {
 
 const t = initTRPC.create();
 
-export const dbDirectory = (...args: string[]) =>
-  process.env.NODE_ENV === 'development'
-    ? path.resolve(process.cwd(), 'db', ...args)
-    : path.resolve(process.cwd(), 'tmp', 'db', ...args);
+export const dbDirectory = (...args: string[]) => {
+  if (process.env.NODE_ENV === 'development') {
+    return path.resolve(process.cwd(), 'db', ...args);
+  }
+  const basePath = path.resolve(process.cwd(), 'tmp');
+  if (!fileSystem.existsSync(basePath)) fileSystem.mkdirSync(basePath);
+  return path.resolve(process.cwd(), 'tmp', 'db', ...args);
+};
 
 const dir = dbDirectory('db.json');
 
