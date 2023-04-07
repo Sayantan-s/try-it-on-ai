@@ -12,10 +12,10 @@ Or, just add the envs from the `docker-compose.yml` to `.env.local` and then
 yarn serve
 ```
 
-\*\* Vercel doesn't allow write access to file on `production`, so had to shift to a third party storage. you can curl this endpoint to see changes in prod.
+**You can curl this below endpoint to see changes in the json in prod.**
 
 ```
 https://api.jsonbin.io/v3/b/642fb904ebd26539d0a61a4d
 ```
 
-But I'd rather suggest to try it out in the dev env.
+But I'd rather suggest to try it out in the dev env of your local machine.
