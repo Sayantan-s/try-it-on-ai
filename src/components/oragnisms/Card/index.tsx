@@ -12,7 +12,7 @@ import { useCanvas } from './useCanvas';
 type Props = TPhoto;
 
 export const Card: FC<Props> = ({ url: img, photo_id }) => {
-  const { mutateAsync, isLoading } = trpc.photos.update.useMutation();
+  const { mutateAsync, isLoading, data } = trpc.photos.update.useMutation();
   const [
     edit,
     url,
@@ -37,6 +37,8 @@ export const Card: FC<Props> = ({ url: img, photo_id }) => {
     setIsEdited(false);
     setShowCardModal(false);
   };
+
+  console.log(data?.message, 'MESSAGE');
 
   return (
     <Fragment>

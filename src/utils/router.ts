@@ -54,9 +54,14 @@ export const appRouter = t.router({
               acc[index] = { ...input, url: input.url };
             return acc;
           }, photos.data);
-          await fs.writeFile(dir, JSON.stringify(photos), 'utf-8'); // In usual scenarios, using a bucket would have been the case, chose to store the base64 directly as url as mentioned in the assignment!
+          await fs.writeFile(dir, JSON.stringify(photos), 'utf-8');
+          return { message: 'File written!' }; // In usual scenarios, using a bucket would have been the case, chose to store the base64 directly as url as mentioned in the assignment!
         } catch (error) {
-          console.log(error);
+          throw new TRPCError({
+            code: 'CONFLICT',
+            message: (error as Error).message,
+            cause: error,
+          });
         }
       }),
   }),
@@ -65,30 +70,14 @@ export const appRouter = t.router({
       await fs.access(dir);
       return { message: 'db is already generated!' } as const;
     } catch (error) {
-      try {
-        await fs.mkdir(dbDirectory()); // Create the db folder
-      } catch (error) {
-        throw new TRPCError({
-          code: 'PARSE_ERROR',
-          message: (error as Error).message,
-          cause: error,
-        });
-      }
-      try {
-        const data = await getPhotos<ApiResponse>(50, 25);
-        const payload = data.map((picture) => ({
-          photo_id: picture.id,
-          url: picture.urls.regular,
-        }));
-        await fs.appendFile(dir, JSON.stringify({ data: payload })); // creates the db.json
-        return { message: 'db generated!' } as const;
-      } catch (error) {
-        throw new TRPCError({
-          code: 'CONFLICT',
-          message: (error as Error).message,
-          cause: error,
-        });
-      }
+      await fs.mkdir(dbDirectory()); // Create the db folder
+      const data = await getPhotos<ApiResponse>(50, 25);
+      const payload = data.map((picture) => ({
+        photo_id: picture.id,
+        url: picture.urls.regular,
+      }));
+      await fs.appendFile(dir, JSON.stringify({ data: payload })); // creates the db.json
+      return { message: 'db generated!' } as const;
     }
   }),
 });

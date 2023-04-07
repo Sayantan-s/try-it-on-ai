@@ -6,8 +6,7 @@ import { useRouter } from 'next/router';
 const Home: NextPage = () => {
   const router = useRouter();
 
-  const { mutate, isLoading, isSuccess, data, error } =
-    trpc.createDB.useMutation();
+  const { mutate, isLoading, isSuccess, data } = trpc.createDB.useMutation();
 
   const goTo = async () => {
     // Used button instead of next/link as its mentioned button on the first point 0.
@@ -39,7 +38,6 @@ const Home: NextPage = () => {
           </Button>
         </div>
       </div>
-      {JSON.stringify(error?.data)}
     </Page>
   );
 };
