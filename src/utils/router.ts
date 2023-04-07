@@ -39,8 +39,16 @@ const mutationInputValidation = z.object({
 export const appRouter = t.router({
   photos: t.router({
     get: t.procedure.query(async () => {
-      const photos: PhotoData = JSON.parse(await fs.readFile(dir, 'utf-8'));
-      return { photos: photos.data };
+      try {
+        const photos: PhotoData = JSON.parse(await fs.readFile(dir, 'utf-8'));
+        return { photos: photos.data };
+      } catch (error) {
+        throw new TRPCError({
+          code: 'CONFLICT',
+          message: (error as Error).message,
+          cause: error,
+        });
+      }
     }),
     update: t.procedure
       .input(mutationInputValidation)
