@@ -21,7 +21,7 @@ const t = initTRPC.create();
 export const dbDirectory = (...args: string[]) =>
   process.env.NODE_ENV === 'development'
     ? path.resolve(process.cwd(), 'db', ...args)
-    : path.join('/tmp', 'db', ...args);
+    : path.resolve(process.cwd(), 'tmp', 'db', ...args);
 
 const dir = dbDirectory('db.json');
 
