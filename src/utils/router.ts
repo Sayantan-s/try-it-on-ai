@@ -1,5 +1,4 @@
 import { TRPCError, initTRPC } from '@trpc/server';
-import fileSystem from 'fs';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { z } from 'zod';
@@ -20,12 +19,7 @@ interface ApiResponse {
 const t = initTRPC.create();
 
 export const dbDirectory = (...args: string[]) => {
-  if (process.env.NODE_ENV === 'development') {
-    return path.resolve(process.cwd(), 'db', ...args);
-  }
-  const basePath = path.resolve(process.cwd(), 'tmp');
-  if (!fileSystem.existsSync(basePath)) fileSystem.mkdirSync(basePath);
-  return path.resolve(process.cwd(), 'tmp', 'db', ...args);
+  return path.resolve(process.cwd(), 'db', ...args);
 };
 
 const dir = dbDirectory('db.json');
@@ -40,8 +34,8 @@ export const appRouter = t.router({
   photos: t.router({
     get: t.procedure.query(async () => {
       try {
-        // const photos: PhotoData = JSON.parse(await fs.readFile(dir, 'utf-8'));
-        return { photos: dir };
+        const photos: PhotoData = JSON.parse(await fs.readFile(dir, 'utf-8'));
+        return { photos: photos.data };
       } catch (error) {
         throw new TRPCError({
           code: 'CONFLICT',
