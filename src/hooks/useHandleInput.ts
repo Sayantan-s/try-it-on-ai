@@ -11,8 +11,8 @@ export const useHandleInput = <T>(
       setState(target.value as T);
       return;
     }
-    const { name, value } = target;
     if (typeof state === 'object' && state !== null && !Array.isArray(state)) {
+      const { name, value } = target;
       setState((prevState) => ({
         ...prevState,
         [name]: value,

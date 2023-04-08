@@ -13,7 +13,7 @@ const Home: NextPage = () => {
     await mutate();
     setTimeout(() => {
       router.push('/galleria');
-    }, 1500); // made it sleep show the text!
+    }, 500); // made it sleep show the text!
   };
 
   const buttonText = isLoading
